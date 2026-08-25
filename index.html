@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .calculator {
+            background: #1c1c1c;
+            padding: 24px;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            width: 320px;
+        }
+
+        #display {
+            width: 100%;
+            height: 70px;
+            background: #2a2a2a;
+            color: #fff;
+            font-size: 2rem;
+            text-align: right;
+            border: none;
+            border-radius: 12px;
+            padding: 0 18px;
+            margin-bottom: 18px;
+            letter-spacing: 1px;
+        }
+
+        #display:focus {
+            outline: none;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        button {
+            height: 60px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.3rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.08s ease, filter 0.15s ease;
+            color: #fff;
+            background: #333;
+        }
+
+        button:hover {
+            filter: brightness(1.25);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        .operator {
+            background: #ff9500;
+        }
+
+        .equals {
+            background: #34c759;
+        }
+
+        .clear {
+            background: #ff3b30;
+        }
+
+        .span-two {
+            grid-column: span 2;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <input type="text" id="display" value="" readonly placeholder="0">
+
+        <div class="buttons">
+            <button class="clear span-two" onclick="clearDisplay()">AC</button>
+            <button class="operator" onclick="deleteLast()">&#9003;</button>
+            <button class="operator" onclick="appendValue('/')">&#247;</button>
+
+            <button onclick="appendValue('7')">7</button>
+            <button onclick="appendValue('8')">8</button>
+            <button onclick="appendValue('9')">9</button>
+            <button class="operator" onclick="appendValue('*')">&#215;</button>
+
+            <button onclick="appendValue('4')">4</button>
+            <button onclick="appendValue('5')">5</button>
+            <button onclick="appendValue('6')">6</button>
+            <button class="operator" onclick="appendValue('-')">&#8722;</button>
+
+            <button onclick="appendValue('1')">1</button>
+            <button onclick="appendValue('2')">2</button>
+            <button onclick="appendValue('3')">3</button>
+            <button class="operator" onclick="appendValue('+')">+</button>
+
+            <button class="span-two" onclick="appendValue('0')">0</button>
+            <button onclick="appendValue('.')">.</button>
+            <button class="equals" onclick="calculate()">=</button>
+        </div>
+    </div>
+
+    <script>
+        const display = document.getElementById('display');
+
+        // Append a value to the display
+        function appendValue(value) {
+            display.value += value;
+        }
+
+        // Clear the entire display
+        function clearDisplay() {
+            display.value = '';
+        }
+
+        // Remove the last character
+        function deleteLast() {
+            display.value = display.value.slice(0, -1);
+        }
+
+        // Evaluate the expression safely
+        function calculate() {
+            try {
+                if (display.value === '') return;
+                // Replace division and multiplication symbols for evaluation
+                const expression = display.value;
+                const result = Function('"use strict"; return (' + expression + ')')();
+                if (result === undefined || isNaN(result)) {
+                    display.value = 'Error';
+                } else {
+                    // Round to avoid floating point noise
+                    display.value = Math.round(result * 1e10) / 1e10;
+                }
+            } catch (err) {
+                display.value = 'Error';
+            }
+        }
+
+        // Keyboard support
+        document.addEventListener('keydown', function (event) {
+            const key = event.key;
+            if (/[0-9+\-*/.]/.test(key)) {
+                appendValue(key);
+            } else if (key === 'Enter') {
+                event.preventDefault();
+                calculate();
+            } else if (key === 'Backspace') {
+                deleteLast();
+            } else if (key === 'Escape') {
+                clearDisplay();
+            }
+        });
+    </script>
+</body>
+</html>
